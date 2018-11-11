@@ -10,11 +10,11 @@ trap cleanup EXIT
 
 docker-compose up -d
 
+docker-compose exec -T composer composer install --ignore-platform-reqs --no-scripts
+
 docker-compose exec -T netcat sh wait_for.sh localstack:4576 -t 60
 
 docker-compose exec -T awscli aws --no-sign-request --endpoint-url http://localstack:4576 --region fake sqs create-queue --queue-name test-queue
-
-docker-compose exec -T php70 php composer.phar install --ignore-platform-reqs --no-scripts
 
 for phpver in php70 php71 php72; do
     docker-compose exec -T ${phpver} vendor/bin/phpcs --standard=PSR2 src/
