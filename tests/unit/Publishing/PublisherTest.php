@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Ndthuan\Tests\AwsSqsWrapper\Unit\Queue;
+namespace Ndthuan\Tests\AwsSqsWrapper\Unit\Publishing;
 
 use Ndthuan\AwsSqsWrapper\Queue\Connector;
-use Ndthuan\AwsSqsWrapper\Queue\Publisher;
+use Ndthuan\AwsSqsWrapper\Publishing\Publisher;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -52,6 +52,6 @@ class PublisherTest extends TestCase
                             ->method('sendMessage')
                             ->with('{"lorem":"ipsum"}');
 
-        $this->publisher->publishJsonString($data);
+        $this->publisher->publishJsonSerializable($data);
     }
 }

@@ -29,7 +29,7 @@ class ReceiveMessageResult
     public static function fromAwsResult(Result $result): ReceiveMessageResult
     {
         $messageObjects = array_map(function (array $message) {
-            return Message::fromArray($message);
+            return ReceivedMessage::fromArray($message);
         }, $result->get('Messages'));
 
         return new self($messageObjects, ResultMetadata::fromArray($result->get('@metadata')));
@@ -38,8 +38,8 @@ class ReceiveMessageResult
     /**
      * ReceiveResult constructor.
      *
-     * @param Message[]      $messages
-     * @param ResultMetadata $metadata
+     * @param ReceivedMessage[] $messages
+     * @param ResultMetadata    $metadata
      */
     public function __construct(array $messages, ResultMetadata $metadata)
     {
@@ -48,7 +48,7 @@ class ReceiveMessageResult
     }
 
     /**
-     * @return Message[]
+     * @return ReceivedMessage[]
      */
     public function getMessages(): array
     {

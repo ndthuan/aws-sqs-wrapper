@@ -30,20 +30,23 @@ class Connector
     /**
      * Connector constructor.
      *
-     * @param SqsClient $sqsClient
-     * @param string    $queueUrl
+     * @param SqsClient  $sqsClient
+     * @param string     $queueUrl
+     * @param array|null $defaultReceiveMessageOptions
      */
-    public function __construct(SqsClient $sqsClient, string $queueUrl)
+    public function __construct(SqsClient $sqsClient, string $queueUrl, array $defaultReceiveMessageOptions = null)
     {
         $this->sqsClient = $sqsClient;
         $this->queueUrl  = $queueUrl;
 
-        $this->defaultReceiveMessageOptions = [
+        $defaultReceiveMessageOptions = $defaultReceiveMessageOptions ?? [
             'AttributeNames'        => ['SentTimestamp'],
             'MaxNumberOfMessages'   => 1,
             'MessageAttributeNames' => ['All'],
             'WaitTimeSeconds'       => 0,
         ];
+
+        $this->defaultReceiveMessageOptions = $defaultReceiveMessageOptions;
     }
 
     /**
@@ -96,14 +99,6 @@ class Connector
         ]);
 
         return ResultMetadata::fromArray($result->get('@metadata'));
-    }
-
-    /**
-     * @param array $defaultReceiveMessageOptions
-     */
-    public function setDefaultReceiveMessageOptions(array $defaultReceiveMessageOptions)
-    {
-        $this->defaultReceiveMessageOptions = $defaultReceiveMessageOptions;
     }
 
     /**

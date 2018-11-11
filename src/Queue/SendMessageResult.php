@@ -41,7 +41,7 @@ class SendMessageResult
             $result->get('MD5OfMessageBody') ?? '',
             $result->get('MD5OfMessageAttributes') ?? '',
             $result->get('MessageId') ?? '',
-            ResultMetadata::fromArray($result->get('') ?? [])
+            ResultMetadata::fromArray($result->get('@metadata') ?? [])
         );
     }
 

@@ -7,6 +7,8 @@ use function array_key_exists;
 
 /**
  * Class MessageAttributes
+ *
+ * Attributes when sending a message.
  */
 class MessageAttributes
 {

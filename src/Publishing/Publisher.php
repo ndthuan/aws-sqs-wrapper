@@ -1,15 +1,18 @@
 <?php
 declare(strict_types=1);
 
-namespace Ndthuan\AwsSqsWrapper\Queue;
+namespace Ndthuan\AwsSqsWrapper\Publishing;
 
 use JsonSerializable;
 use function json_encode;
+use Ndthuan\AwsSqsWrapper\Queue\Connector;
+use Ndthuan\AwsSqsWrapper\Queue\MessageAttributes;
+use Ndthuan\AwsSqsWrapper\Queue\SendMessageResult;
 
 /**
  * Class Publisher
  *
- * Message sender
+ * Message sender.
  */
 class Publisher
 {
@@ -50,11 +53,11 @@ class Publisher
      *
      * @return SendMessageResult
      */
-    public function publishJsonString(
+    public function publishJsonSerializable(
         $jsonSerializable,
         array $additionalParams = [],
         MessageAttributes $attributes = null
     ): SendMessageResult {
-        return $this->connector->sendMessage(json_encode($jsonSerializable), $additionalParams, $attributes);
+        return $this->publishString(json_encode($jsonSerializable), $additionalParams, $attributes);
     }
 }

@@ -34,7 +34,7 @@ class ResultMetadata
     {
         return new self(
             $metadata['statusCode'] ?? 0,
-            $metadata['effective'] ?? '',
+            $metadata['effectiveUri'] ?? '',
             $metadata['headers'] ?? [],
             $metadata['transferStats'] ?? []
         );

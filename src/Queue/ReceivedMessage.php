@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace Ndthuan\AwsSqsWrapper\Queue;
 
 /**
- * Class Message
+ * Class ReceivedMessage
  *
- * Represents an SQS message.
+ * Represents an SQS received message.
  */
-class Message
+class ReceivedMessage
 {
     /**
      * @var string
@@ -38,9 +38,9 @@ class Message
     /**
      * @param array $message
      *
-     * @return Message
+     * @return ReceivedMessage
      */
-    public static function fromArray(array $message): Message
+    public static function fromArray(array $message): ReceivedMessage
     {
         return new self(
             $message['MessageId'] ?? '',
