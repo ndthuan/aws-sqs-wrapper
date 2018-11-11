@@ -3,9 +3,7 @@
 set -ex
 
 function cleanup() {
-    echo Please revert this
-    exit 1
-#   docker-compose down
+   docker-compose down
 }
 
 trap cleanup EXIT
