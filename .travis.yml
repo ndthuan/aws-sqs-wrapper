@@ -1,0 +1,13 @@
+sudo: required
+
+language: php
+
+services:
+  - docker
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+script:
+- bash run_tests.sh
