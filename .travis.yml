@@ -1,7 +1,9 @@
 sudo: required
 
+language: php
+
 services:
   - docker
 
 script:
-- sh run_tests.sh
+- bash run_tests.sh
