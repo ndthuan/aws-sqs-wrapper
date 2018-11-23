@@ -4,7 +4,6 @@
         bootstrap="tests/bootstrap.php"
         cacheTokens="false"
         colors="true"
-        stopOnError="true"
 >
     <testsuites>
         <testsuite name="unit">

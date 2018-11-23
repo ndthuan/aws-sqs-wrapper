@@ -6,17 +6,15 @@ namespace Ndthuan\AwsSqsWrapper\Subscribing;
 use Ndthuan\AwsSqsWrapper\Queue\Connector;
 use Ndthuan\AwsSqsWrapper\Queue\ReceivedMessage;
 use Ndthuan\AwsSqsWrapper\Queue\ResultMetadata;
+use Ndthuan\AwsSqsWrapper\Subscribing\Callbacks\SubscriberCallbacksInterface;
 use Ndthuan\AwsSqsWrapper\Subscribing\Exception\FatalException;
 use Ndthuan\AwsSqsWrapper\Subscribing\Exception\LogicException;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use Throwable;
 
 /**
  * Class AbstractSubscriber
  */
-abstract class AbstractSubscriber implements SubscriberInterface, MessageProcessorInterface, LoggerAwareInterface
+abstract class AbstractSubscriber implements SubscriberInterface, MessageProcessorInterface
 {
     /**
      * @var Connector
@@ -24,37 +22,30 @@ abstract class AbstractSubscriber implements SubscriberInterface, MessageProcess
     private $queueConnector;
 
     /**
+     * @var SubscriberCallbacksInterface
+     */
+    private $callbacks;
+
+    /**
      * @var array
      */
     private $receiveMessageOptions;
 
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * AbstractSubscriber constructor.
      *
-     * @param Connector       $queueConnector
-     * @param array           $receiveMessageOptions
+     * @param Connector $queueConnector
+     * @param SubscriberCallbacksInterface $callbacks
+     * @param array $receiveMessageOptions
      */
     public function __construct(
         Connector $queueConnector,
+        SubscriberCallbacksInterface $callbacks,
         array $receiveMessageOptions = []
     ) {
         $this->queueConnector        = $queueConnector;
+        $this->callbacks             = $callbacks;
         $this->receiveMessageOptions = $receiveMessageOptions;
-
-        $this->setLogger(new NullLogger());
-    }
-
-    /**
-     * @param LoggerInterface $logger
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
     }
 
     /**
@@ -65,35 +56,23 @@ abstract class AbstractSubscriber implements SubscriberInterface, MessageProcess
         $receiveResult = $this->queueConnector->receiveMessage($this->receiveMessageOptions);
 
         foreach ($receiveResult->getMessages() as $message) {
-            $this->logger->info('Received SQS message', ['message' => $message]);
+            $this->callbacks->onMessageReceived($message);
 
             try {
                 $this->processMessage($message, $receiveResult->getMetadata());
-
                 $this->queueConnector->deleteMessage($message->getReceiptHandle());
 
-                $this->logger->info('Successfully processed SQS message', [
-                    'message' => $message,
-                ]);
+                $this->callbacks->onMessageProcessed($message);
             } catch (LogicException $exception) {
                 $this->queueConnector->deleteMessage($message->getReceiptHandle());
 
-                $this->logger->info('Deleted SQS message due to logical exception', [
-                    'message' => $message,
-                    'exception' => $exception,
-                ]);
+                $this->callbacks->onLogicException($message, $exception);
             } catch (FatalException $exception) {
-                $this->logger->critical('Stopped SQS processing due to fatal exception', [
-                    'message' => $message,
-                    'exception' => $exception,
-                ]);
+                $this->callbacks->onFatalException($message, $exception);
 
                 throw $exception;
             } catch (Throwable $exception) {
-                $this->logger->error('Uncaught exception when processing SQS message', [
-                    'message' => $message,
-                    'exception' => $exception,
-                ]);
+                $this->callbacks->onUncaughtException($message, $exception);
             }
         }
     }

@@ -6,6 +6,7 @@ namespace Ndthuan\AwsSqsWrapper\Subscribing;
 use Ndthuan\AwsSqsWrapper\Queue\Connector;
 use Ndthuan\AwsSqsWrapper\Queue\ReceivedMessage;
 use Ndthuan\AwsSqsWrapper\Queue\ResultMetadata;
+use Ndthuan\AwsSqsWrapper\Subscribing\Callbacks\SubscriberCallbacksInterface;
 use Ndthuan\AwsSqsWrapper\Subscribing\Exception\ValidationFailureException;
 
 /**
@@ -23,16 +24,18 @@ class DelegatorSubscriber extends AbstractSubscriber
     /**
      * DelegatorSubscriber constructor.
      *
-     * @param MessageProcessorInterface $messageProcessor
-     * @param Connector                 $queueConnector
-     * @param array                     $receiveMessageOptions
+     * @param MessageProcessorInterface    $messageProcessor
+     * @param Connector                    $queueConnector
+     * @param SubscriberCallbacksInterface $callbacks
+     * @param array                        $receiveMessageOptions
      */
     public function __construct(
         MessageProcessorInterface $messageProcessor,
         Connector $queueConnector,
+        SubscriberCallbacksInterface $callbacks,
         array $receiveMessageOptions = []
     ) {
-        parent::__construct($queueConnector, $receiveMessageOptions);
+        parent::__construct($queueConnector, $callbacks, $receiveMessageOptions);
 
         $this->messageProcessor = $messageProcessor;
     }

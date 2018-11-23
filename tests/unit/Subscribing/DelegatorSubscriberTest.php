@@ -9,6 +9,7 @@ use Ndthuan\AwsSqsWrapper\Queue\Connector;
 use Ndthuan\AwsSqsWrapper\Queue\ReceivedMessage;
 use Ndthuan\AwsSqsWrapper\Queue\ReceiveMessageResult;
 use Ndthuan\AwsSqsWrapper\Queue\ResultMetadata;
+use Ndthuan\AwsSqsWrapper\Subscribing\Callbacks\LoggingCallbacks;
 use Ndthuan\AwsSqsWrapper\Subscribing\DelegatorSubscriber;
 use Ndthuan\AwsSqsWrapper\Subscribing\Exception\FatalException;
 use Ndthuan\AwsSqsWrapper\Subscribing\Exception\LogicException;
@@ -83,10 +84,9 @@ class DelegatorSubscriberTest extends TestCase
         $this->subscriberUnderTest = new DelegatorSubscriber(
             $this->messageProcessorMock,
             $this->connectorMock,
+            new LoggingCallbacks($logger),
             $this->receiveMessageOptions
         );
-
-        $this->subscriberUnderTest->setLogger($logger);
 
         $this->fakeReceiveResultMetadata = ResultMetadata::fromArray([]);
 
@@ -197,7 +197,7 @@ class DelegatorSubscriberTest extends TestCase
         ));
     }
 
-    private function createSampleReceivedMessage()
+    private function createSampleReceivedMessage(): ReceivedMessage
     {
         return new ReceivedMessage(
             'sample-uuid',
