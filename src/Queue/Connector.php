@@ -39,14 +39,12 @@ class Connector
         $this->sqsClient = $sqsClient;
         $this->queueUrl  = $queueUrl;
 
-        $defaultReceiveMessageOptions = $defaultReceiveMessageOptions ?? [
+        $this->defaultReceiveMessageOptions = $defaultReceiveMessageOptions ?? [
             'AttributeNames'        => ['SentTimestamp'],
             'MaxNumberOfMessages'   => 1,
             'MessageAttributeNames' => ['All'],
             'WaitTimeSeconds'       => 0,
         ];
-
-        $this->defaultReceiveMessageOptions = $defaultReceiveMessageOptions;
     }
 
     /**
