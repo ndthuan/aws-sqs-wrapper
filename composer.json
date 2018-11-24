@@ -26,5 +26,9 @@
       "Ndthuan\\Tests\\AwsSqsWrapper\\Unit\\": "tests/unit/",
       "Ndthuan\\Tests\\AwsSqsWrapper\\Integration\\": "tests/integration/"
     }
+  },
+  "scripts": {
+    "test": "phpunit",
+    "analyze": "phpcs --standard=PSR2 src/"
   }
 }

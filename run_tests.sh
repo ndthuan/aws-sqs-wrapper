@@ -18,7 +18,7 @@ docker-compose exec -T awscli aws --no-sign-request --endpoint-url http://locals
 docker-compose exec -T awscli aws --no-sign-request --endpoint-url http://localstack:4576 --region fake sqs purge-queue --queue-url http://localstack:4576/queue/test-queue
 
 for phpver in php70 php71 php72; do
-    docker-compose exec -T ${phpver} sh -c 'pecl list | grep -i xdebug > /dev/null || yes | pecl install xdebug; echo "zend_extension=xdebug.so" > /usr/local/etc/php/conf.d/xdebug.ini'
+    docker-compose exec -T ${phpver} sh -c "pecl list | grep -i xdebug > /dev/null || yes | pecl install xdebug; echo 'zend_extension=xdebug.so' > /usr/local/etc/php/conf.d/xdebug.ini"
     docker-compose exec -T ${phpver} vendor/bin/phpcs --standard=PSR2 src/
     docker-compose exec -T ${phpver} vendor/bin/phpunit --coverage-html=tests/report/${phpver}-coverage
 done
