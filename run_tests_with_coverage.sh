@@ -10,8 +10,8 @@ trap cleanup EXIT
 
 docker-compose up -d
 
-docker-compose exec -T composer composer analyze
 docker-compose exec -T composer composer install --ignore-platform-reqs --no-scripts
+docker-compose exec -T composer composer analyze
 
 docker-compose exec -T netcat sh wait_for.sh localstack:4576 -t 60
 
