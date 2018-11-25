@@ -52,7 +52,7 @@ class LoggingCallbacks implements SubscriberCallbacksInterface
      */
     public function onLogicException(ReceivedMessage $message, LogicException $exception)
     {
-        $this->logger->info('Deleted SQS message due to logical exception', [
+        $this->logger->debug('Deleted SQS message due to logical exception', [
             'messageId' => $message->getId(),
             'exception' => $exception,
         ]);

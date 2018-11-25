@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Ndthuan\Tests\AwsSqsWrapper\Integration;
+namespace Ndthuan\AwsSqsWrapper;
 
 use Aws\Sqs\SqsClient;
 use Ndthuan\AwsSqsWrapper\Queue\Connector;

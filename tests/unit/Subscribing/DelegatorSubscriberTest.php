@@ -1,20 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Ndthuan\Tests\AwsSqsWrapper\Subscribing;
+namespace Ndthuan\AwsSqsWrapper\Subscribing;
 
-use Monolog\Handler\TestHandler;
-use Monolog\Logger;
 use Ndthuan\AwsSqsWrapper\Queue\Connector;
 use Ndthuan\AwsSqsWrapper\Queue\ReceivedMessage;
 use Ndthuan\AwsSqsWrapper\Queue\ReceiveMessageResult;
 use Ndthuan\AwsSqsWrapper\Queue\ResultMetadata;
-use Ndthuan\AwsSqsWrapper\Subscribing\Callbacks\LoggingCallbacks;
-use Ndthuan\AwsSqsWrapper\Subscribing\DelegatorSubscriber;
+use Ndthuan\AwsSqsWrapper\Subscribing\Callbacks\SubscriberCallbacksInterface;
 use Ndthuan\AwsSqsWrapper\Subscribing\Exception\FatalException;
 use Ndthuan\AwsSqsWrapper\Subscribing\Exception\LogicException;
-use Ndthuan\AwsSqsWrapper\Subscribing\MessageProcessorInterface;
-use Ndthuan\AwsSqsWrapper\Subscribing\MessageValidatorInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -38,6 +33,11 @@ class DelegatorSubscriberTest extends TestCase
     private $messageProcessorMock;
 
     /**
+     * @var SubscriberCallbacksInterface|MockObject
+     */
+    private $callbacksMock;
+
+    /**
      * @var ReceivedMessage
      */
     private $fakeReceivedMessage;
@@ -46,11 +46,6 @@ class DelegatorSubscriberTest extends TestCase
      * @var ResultMetadata
      */
     private $fakeReceiveResultMetadata;
-
-    /**
-     * @var TestHandler
-     */
-    private $testLogHandler;
 
     /**
      * @var array
@@ -67,24 +62,26 @@ class DelegatorSubscriberTest extends TestCase
             ->getMock();
 
         $this->messageProcessorMock = $this
-            ->getMockBuilder([
-                MessageValidatorInterface::class,
-                MessageProcessorInterface::class,
-            ])
+            ->getMockBuilder(
+                [
+                    MessageValidatorInterface::class,
+                    MessageProcessorInterface::class,
+                ]
+            )
             ->getMock();
 
         $this->receiveMessageOptions = [
             'WaitTimeSeconds' => 10,
         ];
 
-        $this->testLogHandler = new TestHandler();
-
-        $logger = new Logger('TestLogger', [$this->testLogHandler]);
+        $this->callbacksMock = $this
+            ->getMockBuilder(SubscriberCallbacksInterface::class)
+            ->getMock();
 
         $this->subscriberUnderTest = new DelegatorSubscriber(
             $this->messageProcessorMock,
             $this->connectorMock,
-            new LoggingCallbacks($logger),
+            $this->callbacksMock,
             $this->receiveMessageOptions
         );
 
@@ -113,6 +110,11 @@ class DelegatorSubscriberTest extends TestCase
             ->expects($this->once())
             ->method('validateMessage')
             ->with($this->fakeReceivedMessage);
+
+        $this->callbacksMock
+            ->expects($this->once())
+            ->method('onMessageReceived')
+            ->with($this->fakeReceivedMessage);
     }
 
     /**
@@ -126,9 +128,12 @@ class DelegatorSubscriberTest extends TestCase
             ->with('sample-receipt-handle')
             ->willReturn(ResultMetadata::fromArray([]));
 
-        $this->subscriberUnderTest->pullAndProcessMessages();
+        $this->callbacksMock
+            ->expects($this->once())
+            ->method('onMessageProcessed')
+            ->with($this->fakeReceivedMessage);
 
-        $this->assertTrue($this->testLogHandler->hasInfoThatContains('Successfully processed SQS message'));
+        $this->subscriberUnderTest->pullAndProcessMessages();
     }
 
     /**
@@ -148,9 +153,12 @@ class DelegatorSubscriberTest extends TestCase
             ->with($this->fakeReceivedMessage, $this->fakeReceiveResultMetadata)
             ->willThrowException(new LogicException());
 
-        $this->subscriberUnderTest->pullAndProcessMessages();
+        $this->callbacksMock
+            ->expects($this->once())
+            ->method('onLogicException')
+            ->with($this->fakeReceivedMessage, $this->isInstanceOf(LogicException::class));
 
-        $this->assertTrue($this->testLogHandler->hasInfoThatContains('Deleted SQS message due to logical exception'));
+        $this->subscriberUnderTest->pullAndProcessMessages();
     }
 
     /**
@@ -168,11 +176,14 @@ class DelegatorSubscriberTest extends TestCase
             ->with($this->fakeReceivedMessage, $this->fakeReceiveResultMetadata)
             ->willThrowException(new FatalException());
 
+        $this->callbacksMock
+            ->expects($this->once())
+            ->method('onFatalException')
+            ->with($this->fakeReceivedMessage, $this->isInstanceOf(FatalException::class));
+
         $this->expectException(FatalException::class);
 
         $this->subscriberUnderTest->pullAndProcessMessages();
-
-        $this->assertTrue($this->testLogHandler->hasCriticalThatContains('SQS message processing fatal exception'));
     }
 
     /**
@@ -190,11 +201,12 @@ class DelegatorSubscriberTest extends TestCase
             ->with($this->fakeReceivedMessage, $this->fakeReceiveResultMetadata)
             ->willThrowException(new RuntimeException());
 
-        $this->subscriberUnderTest->pullAndProcessMessages();
+        $this->callbacksMock
+            ->expects($this->once())
+            ->method('onUncaughtException')
+            ->with($this->fakeReceivedMessage, $this->isInstanceOf(RuntimeException::class));
 
-        $this->assertTrue($this->testLogHandler->hasErrorThatContains(
-            'Uncaught exception when processing SQS message'
-        ));
+        $this->subscriberUnderTest->pullAndProcessMessages();
     }
 
     private function createSampleReceivedMessage(): ReceivedMessage
