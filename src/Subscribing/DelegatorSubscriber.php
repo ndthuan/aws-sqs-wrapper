@@ -24,18 +24,18 @@ class DelegatorSubscriber extends AbstractSubscriber
     /**
      * DelegatorSubscriber constructor.
      *
-     * @param MessageProcessorInterface    $messageProcessor
-     * @param Connector                    $queueConnector
-     * @param SubscriberCallbacksInterface $callbacks
-     * @param array                        $receiveMessageOptions
+     * @param MessageProcessorInterface         $messageProcessor
+     * @param Connector                         $queueConnector
+     * @param array                             $receiveMessageOptions
+     * @param SubscriberCallbacksInterface|null $callbacks
      */
     public function __construct(
         MessageProcessorInterface $messageProcessor,
         Connector $queueConnector,
-        SubscriberCallbacksInterface $callbacks,
-        array $receiveMessageOptions = []
+        array $receiveMessageOptions = [],
+        SubscriberCallbacksInterface $callbacks = null
     ) {
-        parent::__construct($queueConnector, $callbacks, $receiveMessageOptions);
+        parent::__construct($queueConnector, $receiveMessageOptions, $callbacks);
 
         $this->messageProcessor = $messageProcessor;
     }

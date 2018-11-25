@@ -1,10 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Ndthuan\Tests\AwsSqsWrapper\Unit\Publishing;
+namespace Ndthuan\AwsSqsWrapper\Publishing;
 
 use Ndthuan\AwsSqsWrapper\Queue\Connector;
-use Ndthuan\AwsSqsWrapper\Publishing\Publisher;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

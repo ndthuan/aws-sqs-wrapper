@@ -5,7 +5,8 @@
   "require": {
     "php": "^7.0",
     "aws/aws-sdk-php": "^3.71",
-    "psr/log": "^1.0"
+    "psr/log": "^1.0",
+    "ext-json": "*"
   },
   "require-dev": {
     "phpunit/phpunit": "^6.5.13",
@@ -22,9 +23,11 @@
   ],
   "autoload": {
     "psr-4": {
-      "Ndthuan\\AwsSqsWrapper\\": "src/",
-      "Ndthuan\\Tests\\AwsSqsWrapper\\Unit\\": "tests/unit/",
-      "Ndthuan\\Tests\\AwsSqsWrapper\\Integration\\": "tests/integration/"
+      "Ndthuan\\AwsSqsWrapper\\": "src/"
     }
+  },
+  "scripts": {
+    "test": "phpunit --testsuite unit",
+    "analyze": "phpcs --standard=PSR2 src/"
   }
 }

@@ -1,9 +1,8 @@
 <?php
 declare(strict_types=1);
 
-namespace Ndthuan\Tests\AwsSqsWrapper\Queue;
+namespace Ndthuan\AwsSqsWrapper\Queue;
 
-use Ndthuan\AwsSqsWrapper\Queue\MessageAttributes;
 use PHPUnit\Framework\TestCase;
 
 class MessageAttributesTest extends TestCase

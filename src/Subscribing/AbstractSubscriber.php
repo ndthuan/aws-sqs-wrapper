@@ -6,6 +6,7 @@ namespace Ndthuan\AwsSqsWrapper\Subscribing;
 use Ndthuan\AwsSqsWrapper\Queue\Connector;
 use Ndthuan\AwsSqsWrapper\Queue\ReceivedMessage;
 use Ndthuan\AwsSqsWrapper\Queue\ResultMetadata;
+use Ndthuan\AwsSqsWrapper\Subscribing\Callbacks\NullCallbacks;
 use Ndthuan\AwsSqsWrapper\Subscribing\Callbacks\SubscriberCallbacksInterface;
 use Ndthuan\AwsSqsWrapper\Subscribing\Exception\FatalException;
 use Ndthuan\AwsSqsWrapper\Subscribing\Exception\LogicException;
@@ -34,18 +35,18 @@ abstract class AbstractSubscriber implements SubscriberInterface, MessageProcess
     /**
      * AbstractSubscriber constructor.
      *
-     * @param Connector $queueConnector
-     * @param SubscriberCallbacksInterface $callbacks
-     * @param array $receiveMessageOptions
+     * @param Connector                         $queueConnector
+     * @param array                             $receiveMessageOptions
+     * @param SubscriberCallbacksInterface|null $callbacks
      */
     public function __construct(
         Connector $queueConnector,
-        SubscriberCallbacksInterface $callbacks,
-        array $receiveMessageOptions = []
+        array $receiveMessageOptions = [],
+        SubscriberCallbacksInterface $callbacks = null
     ) {
         $this->queueConnector        = $queueConnector;
-        $this->callbacks             = $callbacks;
         $this->receiveMessageOptions = $receiveMessageOptions;
+        $this->callbacks             = $callbacks ?? new NullCallbacks();
     }
 
     /**
