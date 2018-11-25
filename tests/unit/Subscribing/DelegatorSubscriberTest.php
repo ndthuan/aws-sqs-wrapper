@@ -81,8 +81,8 @@ class DelegatorSubscriberTest extends TestCase
         $this->subscriberUnderTest = new DelegatorSubscriber(
             $this->messageProcessorMock,
             $this->connectorMock,
-            $this->callbacksMock,
-            $this->receiveMessageOptions
+            $this->receiveMessageOptions,
+            $this->callbacksMock
         );
 
         $this->fakeReceiveResultMetadata = ResultMetadata::fromArray([]);
